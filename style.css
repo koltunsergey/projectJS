@@ -1,0 +1,17 @@
+*{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+}
+
+.wrapper {
+    margin: 0 auto;
+}
+
+#canvas {
+    cursor: none;
+}
