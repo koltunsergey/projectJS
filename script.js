@@ -147,7 +147,7 @@ function render() {
 
     asteroids.forEach(element => {
         // рисуем астероид
-        context.drawImage(asterimg, element.zx, element.zy, step, step, element.x, element.y, step, step);
+        context.drawImage(asterimg, element.zx, element.zy, step, step, element.x, element.y, step/1.5, step/1.5);
     });
 
     exploz.forEach(element => {
@@ -197,7 +197,7 @@ function arrRemove(arr1, arr2, arr3) {
 
 function arrExpl(arr) {
     arr.forEach(function (element, index, object) {
-            if (((player.y - element.y + 50) <= (imgH/2+step/2)) && (Math.abs(element.x - player.x + 70) <= (imgW/2+step/2))) {
+            if (((player.y - element.y + 50) <= (imgH/2+step/2)) && (Math.abs(element.x - player.x+100) <= (imgW/2+step/2))) {
                 object.splice(index, 1);
                 player.lives = player.lives - 1; // уменьшаем жизни
             };
@@ -241,7 +241,7 @@ function update() {
         });
     }
 
-    if (timer % 60 == 0) {
+    if (timer % 30 == 0) {
         asteroids.push({
             x: random(0, w),
             y: random(0, h / 100),
