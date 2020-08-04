@@ -155,9 +155,12 @@ function render() {
         context.drawImage(explimg, step2*Math.floor(element.ax), step2*Math.floor(element.ay), step2, step2, element.x, element.y, step2, step2);
     });
 
-
-
-
+    // выводим на экран счёт
+    context.fillStyle = "white";
+    context.font='24px sans-serif';
+    context.fillText("SCORE: " + score, 50, 50, 200);
+    context.fillText("LIVES: " + player.lives, 50, 100, 200);
+    
 }
 
 // заставляем звёзды двигаться по игрику вниз и удаляем из массива улетевшие
@@ -191,6 +194,17 @@ function arrRemove(arr1, arr2, arr3) {
     });
     return score;
 };
+
+function arrExpl(arr) {
+    arr.forEach(function (element, index, object) {
+            if (((player.y - element.y + 50) <= (imgH/2+step/2)) && (Math.abs(element.x - player.x + 70) <= (imgW/2+step/2))) {
+                object.splice(index, 1);
+                player.lives = player.lives - 1; // уменьшаем жизни
+            };
+        });
+    return player.lives;
+};
+
 // все обновления будут происходить тут
 
 function update() {
@@ -198,6 +212,7 @@ function update() {
     arrMove(stars);
     arrMove(rockets);
     arrMove(asteroids);
+    arrExpl(asteroids);
     arrRemove(rockets, asteroids, exploz);
 
     // анимируем взрыв
