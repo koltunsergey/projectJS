@@ -1,6 +1,6 @@
-"use strick"
-const CIRCLE = Math.PI * 2;
+"use strict";
 
+const CIRCLE = Math.PI * 2;
 let canvas = document.getElementById("canvas"); // получаем холст
 let context = canvas.getContext("2d"); // получаем контекст
 let timer = 0;
@@ -8,6 +8,8 @@ let imgW = 348; // размер спрайта корабля
 let imgH = 145; // размер спрайта корабля
 let step = 1024 / 8 // размеры одного астероида
 let step2 = 900 / 9 // размеры одного взрыва
+
+
 let clickAudio = new Audio("sound.wav");
 // подстраиваемся под ширину окна браузера
 let w = canvas.width = window.innerWidth;
@@ -65,8 +67,8 @@ canvas.addEventListener('touchmove', function (event) {
     event.stopPropagation();
     if (event.targetTouches.length == 1) {
         var touch = event.targetTouches[0];
-        player.x = touch.pageX - player.shipW/4;
-        player.y = touch.pageY - palayr.shipH/4;
+        player.x = touch.pageX - player.shipW / 4;
+        player.y = touch.pageY - palayr.shipH / 4;
     }
 }, false);
 canvas.addEventListener('touchend', function (event) {
@@ -96,8 +98,6 @@ function fire() {
     });
     clickSound();
 }
-
-
 
 // двигаем игрока с помощью клавиатуры
 document.addEventListener('keydown', function (EO) {
@@ -154,7 +154,6 @@ let sprites = {
     aster: undefined,
     expl: undefined,
 };
-
 
 function clickSoundInit() {
     clickAudio.play(); // запускаем звук
@@ -254,9 +253,6 @@ function update() {
         });
     }
 
-
-
-
     function arrExpl(arr) {
         arr.forEach(function (element, index, object) {
             if (((player.y - element.y + 50) <= (imgH / 2 + step / 2)) && (Math.abs(element.x - player.x + 100) <= (imgW / 2 + step / 2))) {
@@ -281,7 +277,7 @@ function update() {
                     object1.splice(index1, 1);
                     object2.splice(index2, 1);    // почистим массив из улетехших пуль и астероид
                     player.score = player.score + 1; // увеличиваем счёт
-                    
+
                 };
             });
         });
@@ -290,6 +286,7 @@ function update() {
 
     // вводим таймер, который срабатывает через определённое обновление фреймов и добавляем новые звёзды с верхней части экрана
     timer++;
+    if (timer > 2000) timer = 0;
     if (timer % 10 == 0) {
         stars.push({
             x: random(0, w),
@@ -330,13 +327,111 @@ function update() {
             expl: 0, // взорван ли астероид
         });
     }
+
+    if (player.lives == 0) {
+        gameOver();
+    }
 }
+
+let requestId = 0;
 
 function gameLoop() {
- 
+    if (requestId) {
+        window.cancelAnimationFrame(requestId);
+        requestId = 0;
+    }
     render();
     update();
-    RAF(gameLoop);
+    requestId = requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
+window.onload = startDocument;
+
+window.onhashchange = switchURLHash;
+
+let isPlaying = false;
+
+
+function switchURLHash(EO){
+    EO = EO || window.event;
+    let toClose;
+    // узнаемм заначение закладки
+    let URLHash = window.location.hash;
+    // удаляем первый символ
+    let stateStr = URLHash.substr(1);
+    switch (stateStr) {
+        case "menu":
+            // если переход в меню из запущеной игры
+            if (isPlaying) {
+                toClose = confirm("В случае перезагрузки страницы прогресс игры будет утрачен!");
+                if (toClose) {
+                    startMenu();
+                    isPlaying = false;
+                }
+                else location.hash = "game";
+            }
+            // если game over
+            else startMenu();
+            break;
+        // если закладка игры
+        case "game":
+            startGame();
+            break;
+    }
+}
+
+function startDocument() {
+    location.hash = "menu";
+}
+
+let wrapper = document.querySelector(".menu");
+let gameWrapper = document.querySelector(".game");
+let gameOverWrapper = document.querySelector(".gameOver");
+
+function startHash() {
+    location.hash = "game";
+};
+
+function startMenuHash() {
+    location.hash = "menu";
+};
+
+// по нажатию на кнопку, запускаем игру
+function startGame() {
+    isPlaying = true;
+    location.hash = "game";
+    // скрываем главное меню
+    wrapper.style.display = "none";
+    // открываем игровые элементы
+    gameWrapper.style.display = "block";
+    gameLoop();
+}
+
+// запуск главного меню
+function startMenu() {
+    location.hash = "menu";
+    // открываем главное меню
+    wrapper.style.display = "block";
+    // скрываем игровые элементы
+    gameWrapper.style.display = "none";
+    gameOverWrapper.style.display = "none";
+    asteroids.length = 0;
+    rockets.length = 0;
+    player.lives = 3;
+    player.score = 0;
+    if (requestId) {
+        window.cancelAnimationFrame(requestId);
+        requestId = 0;
+    }
+}
+
+function gameOver() {
+    // скрываем игровые элементы
+    gameWrapper.style.display = "none";
+    gameOverWrapper.style.display = "block";
+    isPlaying = false;
+    if (requestId) {
+        window.cancelAnimationFrame(requestId);
+        requestId = 0;
+    }
+}
