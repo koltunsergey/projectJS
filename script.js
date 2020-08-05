@@ -58,7 +58,7 @@ let player = {
 canvas.addEventListener('touchstart', function (event) {
     event.preventDefault();
     event.stopPropagation();
-    if (event.targetTouches.length < 2) {
+    if (event.targetTouches.length == 1) {
         fire() /*Ваш код*/
     }
 }, false);
@@ -68,13 +68,14 @@ canvas.addEventListener('touchmove', function (event) {
     if (event.targetTouches.length == 1) {
         var touch = event.targetTouches[0];
         player.x = touch.pageX - player.shipW / 4;
-        player.y = touch.pageY - palayr.shipH;
+        player.y = touch.pageY + player.shipH / 4;
     }
 }, false);
 // canvas.addEventListener('touchend', function (event) {
 //     event.preventDefault();
 //     event.stopPropagation();
-//     /* Здесь ваш код обработки события*/
+//     player.x = touch.pageX - player.shipW / 4;
+//     player.y = touch.pageY + player.shipH / 4;
 // }, false);
 
 // навешиваем листенер события движеня мыши и перемещаем туда игрока
