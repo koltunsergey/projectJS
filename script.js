@@ -64,8 +64,8 @@ canvas.addEventListener('touchmove', function (event) {
     event.stopPropagation();
     if (event.targetTouches.length == 1) {
         var touch = event.targetTouches[0];
-        player.x = touch.pageX - player.shipW/2;
-        player.y = touch.pageY - palayr.shipH/2;
+        player.x = touch.pageX - player.shipW/4;
+        player.y = touch.pageY - palayr.shipH/4;
     }
 }, false);
 canvas.addEventListener('touchend', function (event) {
