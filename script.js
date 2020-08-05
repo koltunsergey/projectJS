@@ -1,5 +1,3 @@
-"use strict";
-
 const CIRCLE = Math.PI * 2;
 
 let canvas = document.getElementById("canvas"); // получаем холст
@@ -9,6 +7,26 @@ let imgW = 348; // размер спрайта корабля
 let imgH = 145; // размер спрайта корабля
 let step = 1024 / 8 // размеры одного астероида
 let step2 = 900 / 9 // размеры одного взрыва
+
+function vibrate(val){
+    if("vibrate" in navigator)  return navigator.vibrate(val);
+    if("oVibrate" in navigator)  return navigator.oVibrate(val);
+    if("mozVibrate" in navigator)  return navigator.mozVibrate(val);
+    if("webkitVibrate" in navigator)  return navigator.webkitVibrate(val);
+    document.getElementById('error').innerHTML = "Ваш браузер не поддерживает vibration Api .. попробуйте открыть пример в мобильном fixefox, там все точно работает";
+  }
+  
+  function infiniteVibrate(val, interval) {
+    stopVibrate();
+    vInterval = setInterval(function() {
+       vibrate(val);
+    }, interval);
+  }
+  
+  function stopVibrate() {
+    if(typeof(vInterval)!=="undefined") clearInterval(vInterval);
+    vibrate(0);
+  }
 
 
 function random(min, max) {
@@ -20,24 +38,6 @@ function random(min, max) {
 // подстраиваемся под ширину окна браузера
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
-
-let player = {
-    x: w / 2 - imgW / 4,
-    y: h - imgH,
-    lives: 3,
-}; // объект игрока
-
-let playerimg = new Image();
-playerimg.src = "player.png";
-
-let rocketimg = new Image();
-rocketimg.src = "rocket.png";
-
-let asterimg = new Image();
-asterimg.src = "aster.png";
-
-let explimg = new Image();
-explimg.src = "expl.png";
 
 let asteroids = [];
 let rockets = [];
@@ -65,6 +65,26 @@ function fire() {
     });
 }
 
+player = {
+    shipW: 348, // размер спрайта корабля
+    shipH: 145, // размер спрайта корабля
+    x: w/2 - 150, // начальные точки корабля
+    y: h - 100,   // начальные точки корабля
+    dx: 0,
+    dy: 0,
+    vx: 10,
+    vy: 10,
+    // move: function () {
+    //     this.x += this.dx;
+    //     this.y += this.dy;
+    // },
+    // stop: function () {
+    //     this.dx = 0;
+    //     this.dy = 0;
+    // },
+    lives: 3,
+    score: 0,
+};
 
 // двигаем игрока с помощью клавиатуры
 document.addEventListener('keydown', function (EO) {
@@ -86,6 +106,15 @@ document.addEventListener('keydown', function (EO) {
             break;
     }
 });
+
+// canvas.addEventListener('keyup', function (EO) {
+//     player.stop();
+// });
+
+// if (player.dx || player.dy) {
+//     player.move();
+// };
+
 
 // кросбраузерность для requestAnimationFrame
 let RAF = (function () {
@@ -115,8 +144,21 @@ let stars = new Array(300).fill().map(() => {
     };
 });
 
+let sprites = {
+    player: undefined,
+    rocket: undefined,
+    aster: undefined,
+    expl: undefined,
+};
+
 // отрисовываем игровое поле
 function render() {
+    context.clearRect(0, 0, w, h);
+        // загружаем все спрайты циклом по имени ключа
+    for (let key in sprites) {
+        sprites[key] = new Image();
+        sprites[key].src = "" + key + ".png";
+    };
 
     // рисуем подобие космического неба в нашем канвасе
     let grad = context.createLinearGradient(0, 0, 0, h);
@@ -135,30 +177,29 @@ function render() {
     });
 
     rockets.forEach(element => {
-        context.drawImage(rocketimg, element.x + 15, element.y - 5);
-        // context.drawImage(rocketimg, element.x + imgW / 2 - 45, element.y-5);
+        context.drawImage(sprites.rocket, element.x + 15, element.y - 5);
     });
 
     // рисуем игрока
-    context.drawImage(playerimg, 0, 0, imgW / 2, imgH, player.x, player.y, imgW / 2, imgH);
+    context.drawImage(sprites.player, 0, 0, imgW / 2, imgH, player.x, player.y, imgW / 2, imgH);
 
     // рисуем огонь тягу
-    context.drawImage(playerimg, imgW / 2, 0, imgW, imgH, player.x, player.y, imgW, imgH);
+    context.drawImage(sprites.player, imgW / 2, 0, imgW, imgH, player.x, player.y, imgW, imgH);
 
     asteroids.forEach(element => {
         // рисуем астероид
-        context.drawImage(asterimg, element.zx, element.zy, step, step, element.x, element.y, step/1.5, step/1.5);
+        context.drawImage(sprites.aster, element.zx, element.zy, step, step, element.x, element.y, step/1.5, step/1.5);
     });
 
     exploz.forEach(element => {
         // рисуем взрыв
-        context.drawImage(explimg, step2*Math.floor(element.ax), step2*Math.floor(element.ay), step2, step2, element.x, element.y, step2, step2);
+        context.drawImage(sprites.expl, step2*Math.floor(element.ax), step2*Math.floor(element.ay), step2, step2, element.x, element.y, step2, step2);
     });
 
     // выводим на экран счёт
     context.fillStyle = "white";
     context.font='24px sans-serif';
-    context.fillText("SCORE: " + score, 50, 50, 200);
+    context.fillText("SCORE: " + player.score, 50, 50, 200);
     context.fillText("LIVES: " + player.lives, 50, 100, 200);
     
 }
@@ -174,8 +215,6 @@ function arrMove(arr) {
     });
 }
 
-let score = 0;
-
 function arrRemove(arr1, arr2, arr3) {
     arr1.forEach(function (element1, index1, object1) {
         arr2.forEach(function (element2, index2, object2) {
@@ -188,11 +227,11 @@ function arrRemove(arr1, arr2, arr3) {
                 });
                 object1.splice(index1, 1);
                 object2.splice(index2, 1);    // почистим массив из улетехших пуль и астероид
-                score = score + 1; // увеличиваем счёт
+                player.score = player.score + 1; // увеличиваем счёт
             };
         });
     });
-    return score;
+    return player.score;
 };
 
 function arrExpl(arr) {
@@ -200,6 +239,7 @@ function arrExpl(arr) {
             if (((player.y - element.y + 50) <= (imgH/2+step/2)) && (Math.abs(element.x - player.x+100) <= (imgW/2+step/2))) {
                 object.splice(index, 1);
                 player.lives = player.lives - 1; // уменьшаем жизни
+                vibrate(1000);
             };
         });
     return player.lives;
@@ -253,19 +293,18 @@ function update() {
     }
 }
 
-function gameLoop() {
+function oop() {
     render();
     update();
-    RAF(gameLoop);
+    RAF(oop);
 }
 
-explimg.onload = function(){
-gameLoop();
-};
+
+oop();
+
 
 // подстраиваемся под ресайз окна
 window.addEventListener("resize", () => {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
 })
-
