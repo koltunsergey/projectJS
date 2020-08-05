@@ -58,7 +58,7 @@ let player = {
 canvas.addEventListener('touchstart', function (event) {
     event.preventDefault();
     event.stopPropagation();
-    if (event.targetTouches.length == 1) {
+    if (event.targetTouches.length < 2) {
         fire() /*Ваш код*/
     }
 }, false);
@@ -68,14 +68,14 @@ canvas.addEventListener('touchmove', function (event) {
     if (event.targetTouches.length == 1) {
         var touch = event.targetTouches[0];
         player.x = touch.pageX - player.shipW / 4;
-        player.y = touch.pageY - palayr.shipH / 4;
+        player.y = touch.pageY - palayr.shipH;
     }
 }, false);
-canvas.addEventListener('touchend', function (event) {
-    event.preventDefault();
-    event.stopPropagation();
-    /* Здесь ваш код обработки события*/
-}, false);
+// canvas.addEventListener('touchend', function (event) {
+//     event.preventDefault();
+//     event.stopPropagation();
+//     /* Здесь ваш код обработки события*/
+// }, false);
 
 // навешиваем листенер события движеня мыши и перемещаем туда игрока
 canvas.addEventListener("mousemove", function (EO) {
@@ -396,23 +396,19 @@ function startMenuHash() {
     location.hash = "menu";
 };
 
-// по нажатию на кнопку, запускаем игру
+// запускаем игру
 function startGame() {
     isPlaying = true;
     location.hash = "game";
-    // скрываем главное меню
     wrapper.style.display = "none";
-    // открываем игровые элементы
     gameWrapper.style.display = "block";
     gameLoop();
 }
 
-// запуск главного меню
+// главное меню
 function startMenu() {
     location.hash = "menu";
-    // открываем главное меню
     wrapper.style.display = "block";
-    // скрываем игровые элементы
     gameWrapper.style.display = "none";
     gameOverWrapper.style.display = "none";
     asteroids.length = 0;
@@ -426,7 +422,6 @@ function startMenu() {
 }
 
 function gameOver() {
-    // скрываем игровые элементы
     gameWrapper.style.display = "none";
     gameOverWrapper.style.display = "block";
     isPlaying = false;
