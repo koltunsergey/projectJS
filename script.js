@@ -1,3 +1,4 @@
+"use strick"
 const CIRCLE = Math.PI * 2;
 
 let canvas = document.getElementById("canvas"); // получаем холст
@@ -93,6 +94,7 @@ function fire() {
         y: player.y - 5,
         s: -2
     });
+    clickSound();
 }
 
 
@@ -279,7 +281,7 @@ function update() {
                     object1.splice(index1, 1);
                     object2.splice(index2, 1);    // почистим массив из улетехших пуль и астероид
                     player.score = player.score + 1; // увеличиваем счёт
-                    clickSound();
+                    
                 };
             });
         });
@@ -331,7 +333,7 @@ function update() {
 }
 
 function gameLoop() {
-    clickSoundInit(); // важно "запустить" звук по событию, т.е. нажатию кнопки
+ 
     render();
     update();
     RAF(gameLoop);
