@@ -4,21 +4,43 @@ const CIRCLE = Math.PI * 2;
 let canvas = document.getElementById("canvas"); // получаем холст
 let context = canvas.getContext("2d"); // получаем контекст
 let timer = 0;
-let imgW = 348; // размер спрайта корабля
-let imgH = 145; // размер спрайта корабля
+let imgW = 340; // размер спрайта корабля
+let imgH = 170; // размер спрайта корабля
 let step = 1024 / 8 // размеры одного астероида
 let step2 = 900 / 9 // размеры одного взрыва
-
+let asterSize = 128;
+let explSize = 100;
+let rocketSize = 30;
 
 let clickAudio = new Audio("sound.wav");
 // подстраиваемся под ширину окна браузера
-let w = canvas.width = window.innerWidth;
-let h = canvas.height = window.innerHeight;
+let w = window.innerWidth;
+let h = window.innerHeight;
+
+canvas.setAttribute('width', w);
+canvas.setAttribute('height', h);
+
+imgW = Math.round((w * 0.2 / 340)*  imgW);
+imgH = imgW/2;
+asterSize = Math.round((h * 0.15 / 128)*asterSize);
+explSize = Math.round((h * 0.15 / 100)*explSize);
+rocketSize = Math.round((h * 0.03 / 30)*rocketSize);
+
+function resizeGame() {
+    h = window.innerHeight;
+    w = window.innerWidth;
+    canvas.setAttribute("height", h);
+    canvas.setAttribute("width", w);
+    imgW = Math.round((w * 0.2 / 340)*  340);
+    imgH = imgW/2;
+    // imgH = Math.round((h * 0.2 / 170) *170 );
+    asterSize = Math.round((h * 0.15 / 128)*asterSize);
+    explSize = Math.round((h * 0.15 / 100)*explSize);
+    rocketSize = Math.round((h * 0.05 / 30)*rocketSize);
+};
+
 // подстраиваемся под ресайз окна
-window.addEventListener("resize", () => {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-})
+window.addEventListener("resize", resizeGame)
 
 function random(min, max) {
     min = Math.ceil(min);
@@ -34,8 +56,8 @@ let exploz = [];
 
 // объект игрока
 let player = {
-    shipW: 348, // размер спрайта корабля
-    shipH: 145, // размер спрайта корабля
+    shipW: 340, // размер спрайта корабля
+    shipH: 170, // размер спрайта корабля
     x: w / 2 - 150, // начальные точки корабля
     y: h - 100,   // начальные точки корабля
     dx: 0,
@@ -67,8 +89,8 @@ canvas.addEventListener('touchmove', function (event) {
     event.stopPropagation();
     if (event.targetTouches.length == 1) {
         var touch = event.targetTouches[0];
-        player.x = touch.pageX - player.shipW / 4;
-        player.y = touch.pageY + player.shipH / 4;
+        player.x = touch.pageX - imgW / 4;
+        player.y = touch.pageY - imgH / 2;
     }
 }, false);
 // canvas.addEventListener('touchend', function (event) {
@@ -81,7 +103,7 @@ canvas.addEventListener('touchmove', function (event) {
 // навешиваем листенер события движеня мыши и перемещаем туда игрока
 canvas.addEventListener("mousemove", function (EO) {
     player.x = EO.offsetX - imgW / 4;
-    player.y = EO.offsetY - imgH / 4;
+    player.y = EO.offsetY - imgH / 2;
 });
 
 canvas.addEventListener("click", fire);
@@ -93,8 +115,8 @@ function fire() {
         s: -2
     });
     rockets.push({
-        x: player.x + imgW / 2 - 45,
-        y: player.y - 5,
+        x: player.x + imgW/3,
+        y: player.y,
         s: -2
     });
     clickSound();
@@ -175,8 +197,6 @@ for (let key in sprites) {
 function render() {
     context.clearRect(0, 0, w, h);
     // загружаем все спрайты циклом по имени ключа
-
-
     // рисуем подобие космического неба в нашем канвасе
     let grad = context.createLinearGradient(0, 0, 0, h);
     grad.addColorStop(0, "#000000");
@@ -194,30 +214,30 @@ function render() {
     });
 
     rockets.forEach(element => {
-        context.drawImage(sprites.rocket, element.x + 15, element.y - 5);
+        context.drawImage(sprites.rocket, element.x + 9, element.y - 5, rocketSize, rocketSize*2);
     });
 
     // рисуем игрока
-    context.drawImage(sprites.player, 0, 0, imgW / 2, imgH, player.x, player.y, imgW / 2, imgH);
+    context.drawImage(sprites.player, 0, 0, 340 / 2, 170, player.x, player.y, imgW / 2, imgH);
 
     // рисуем огонь тягу
-    context.drawImage(sprites.player, imgW / 2, 0, imgW, imgH, player.x, player.y, imgW, imgH);
+    context.drawImage(sprites.player, 340 / 2, 0, 340, 170, player.x, player.y, imgW, imgH);
 
     asteroids.forEach(element => {
         // рисуем астероид
-        context.drawImage(sprites.aster, element.zx, element.zy, step, step, element.x, element.y, step / 1.5, step / 1.5);
+        context.drawImage(sprites.aster, element.zx, element.zy, step, step, element.x, element.y, asterSize, asterSize);
     });
 
     exploz.forEach(element => {
         // рисуем взрыв
-        context.drawImage(sprites.expl, step2 * Math.floor(element.ax), step2 * Math.floor(element.ay), step2, step2, element.x, element.y, step2, step2);
+        context.drawImage(sprites.expl, step2 * Math.floor(element.ax), step2 * Math.floor(element.ay), step2, step2, element.x, element.y, explSize, explSize);
     });
 
     // выводим на экран счёт
     context.fillStyle = "white";
     context.font = '24px sans-serif';
-    context.fillText("SCORE: " + player.score, 50, 50, 200);
-    context.fillText("LIVES: " + player.lives, 50, 100, 200);
+    context.fillText("SCORE: " + player.score, 25, 25, 100);
+    context.fillText("LIVES: " + player.lives, 25,50, 100);
 
 }
 
@@ -256,7 +276,7 @@ function update() {
 
     function arrExpl(arr) {
         arr.forEach(function (element, index, object) {
-            if (((player.y - element.y + 50) <= (imgH / 2 + step / 2)) && (Math.abs(element.x - player.x + 100) <= (imgW / 2 + step / 2))) {
+            if (((player.y - element.y + 10) <= (imgH / 2 + asterSize / 2)) && ((Math.abs(element.x - player.x + 10)) <= (imgW/2 + asterSize/2))) {
                 object.splice(index, 1);
                 player.lives = player.lives - 1; // уменьшаем жизни
                 vibrate(500);
@@ -278,7 +298,6 @@ function update() {
                     object1.splice(index1, 1);
                     object2.splice(index2, 1);    // почистим массив из улетехших пуль и астероид
                     player.score = player.score + 1; // увеличиваем счёт
-
                 };
             });
         });
@@ -287,7 +306,7 @@ function update() {
 
     // вводим таймер, который срабатывает через определённое обновление фреймов и добавляем новые звёзды с верхней части экрана
     timer++;
-    if (timer > 2000) timer = 0;
+    if (timer > 500) timer = 0;
     if (timer % 10 == 0) {
         stars.push({
             x: random(0, w),
@@ -408,6 +427,7 @@ function startGame() {
 
 // главное меню
 function startMenu() {
+    timer = 0;
     location.hash = "menu";
     wrapper.style.display = "block";
     gameWrapper.style.display = "none";
@@ -423,6 +443,7 @@ function startMenu() {
 }
 
 function gameOver() {
+    timer = 0;
     gameWrapper.style.display = "none";
     gameOverWrapper.style.display = "block";
     isPlaying = false;
