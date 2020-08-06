@@ -22,7 +22,11 @@ canvas.setAttribute('height', h);
 
 imgW = Math.round((w * 0.2 / 340)*  imgW);
 imgH = imgW/2;
-asterSize = Math.round((h * 0.15 / 128)*asterSize);
+if (h>w) {
+asterSize = Math.round((h * 0.09  / 128)*asterSize);}
+else {
+    asterSize = Math.round((w * 0.09  / 128)*asterSize);
+}
 explSize = Math.round((h * 0.15 / 100)*explSize);
 rocketSize = Math.round((h * 0.03 / 30)*rocketSize);
 
@@ -34,7 +38,11 @@ function resizeGame() {
     imgW = Math.round((w * 0.2 / 340)*  340);
     imgH = imgW/2;
     // imgH = Math.round((h * 0.2 / 170) *170 );
-    asterSize = Math.round((h * 0.15 / 128)*asterSize);
+    if (h>w) {
+        asterSize = Math.round((h * 0.09 / 128)*asterSize);}
+        else {
+            asterSize = Math.round((w *  0.09 / 128)*asterSize);
+        }
     explSize = Math.round((h * 0.15 / 100)*explSize);
     rocketSize = Math.round((h * 0.05 / 30)*rocketSize);
 };
@@ -244,7 +252,11 @@ function render() {
 // все обновления будут происходить тут
 
 function update() {
-
+    
+    if (player.lives == 0) {
+        gameOver();
+    }
+    
     arrMove(stars);
     arrMove(rockets);
     arrMove(asteroids);
@@ -262,7 +274,7 @@ function update() {
             object.splice(index, 1);
         }
     });
-
+    
     // заставляем звёзды двигаться по игрику вниз и удаляем из массива улетевшие
     // будем использовать эту же функцию и для ракет
     function arrMove(arr) {
@@ -347,17 +359,13 @@ function update() {
             expl: 0, // взорван ли астероид
         });
     }
-
-    if (player.lives == 0) {
-        gameOver();
-    }
 }
 
 let requestId = 0;
 
 function gameLoop() {
     if (requestId) {
-        window.cancelAnimationFrame(requestId);
+        cancelAnimationFrame(requestId);
         requestId = 0;
     }
     render();
@@ -422,11 +430,34 @@ function startGame() {
     location.hash = "game";
     wrapper.style.display = "none";
     gameWrapper.style.display = "block";
+    
     gameLoop();
 }
 
+function loadInfo() {
+    $.ajax("https://koltunsergey.github.io/projectJS/test.html",
+        { type:'GET', dataType:'html', success:dataLoaded, error:errorHandler }
+    );
+}
+
+function dataLoaded(data) {
+    document.getElementById('rules').innerHTML = data;
+}
+
+function errorHandler(jqXHR,statusStr,errorStr) {
+    alert(statusStr+' '+errorStr);
+}
+
+
 // главное меню
 function startMenu() {
+    let yourScore = 0;
+    if (('localStorage' in window) && (window.localStorage !== null)) {
+        let scoreDiv = document.getElementById('score');
+        localStorage.setItem('lastScore', yourScore);
+        let localValue = localStorage.getItem('lastScore');
+        scoreDiv.innerText = "Выш предыдущий счёт: " + localValue;
+    }
     timer = 0;
     location.hash = "menu";
     wrapper.style.display = "block";
@@ -440,10 +471,14 @@ function startMenu() {
         window.cancelAnimationFrame(requestId);
         requestId = 0;
     }
+
+
 }
+
 
 function gameOver() {
     timer = 0;
+    asteroids.length = 0;
     gameWrapper.style.display = "none";
     gameOverWrapper.style.display = "block";
     isPlaying = false;
@@ -451,4 +486,8 @@ function gameOver() {
         window.cancelAnimationFrame(requestId);
         requestId = 0;
     }
+    yourScore = player.score;
 }
+
+
+

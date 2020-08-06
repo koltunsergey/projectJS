@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width">
     <title>Final project Koltun Sergey</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
+    <script src="https://fe.it-academy.by/JQ/jquery.js"></script>
 </head>
 
 <body>
@@ -15,7 +16,9 @@
 
     <div class="menu">
         <div class="container">
+            <div id="score" class="score"></div>
             <div onclick="startHash()" class="startBtn">Запуск</div>
+            <div onclick="loadInfo()" class="startBtn" id = "rules">Загрузить правила</div>
         </div>
     </div>
 
@@ -25,7 +28,7 @@
         </div>
     </div>
 
-        <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
