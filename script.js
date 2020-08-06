@@ -447,17 +447,18 @@ function dataLoaded(data) {
 function errorHandler(jqXHR,statusStr,errorStr) {
     alert(statusStr+' '+errorStr);
 }
-
+let yourScore = 0;
 
 // главное меню
 function startMenu() {
-    let yourScore = 0;
+
     if (('localStorage' in window) && (window.localStorage !== null)) {
         let scoreDiv = document.getElementById('score');
         localStorage.setItem('lastScore', yourScore);
         let localValue = localStorage.getItem('lastScore');
         scoreDiv.innerText = "Выш предыдущий счёт: " + localValue;
     }
+
     timer = 0;
     location.hash = "menu";
     wrapper.style.display = "block";
@@ -477,6 +478,7 @@ function startMenu() {
 
 
 function gameOver() {
+    yourScore = player.score;
     timer = 0;
     asteroids.length = 0;
     gameWrapper.style.display = "none";
@@ -486,7 +488,6 @@ function gameOver() {
         window.cancelAnimationFrame(requestId);
         requestId = 0;
     }
-    yourScore = player.score;
 }
 
 
