@@ -20,31 +20,33 @@ let h = window.innerHeight;
 canvas.setAttribute('width', w);
 canvas.setAttribute('height', h);
 
-imgW = Math.round((w * 0.2 / 340)*  imgW);
-imgH = imgW/2;
-if (h>w) {
-asterSize = Math.round((h * 0.09  / 128)*asterSize);}
-else {
-    asterSize = Math.round((w * 0.09  / 128)*asterSize);
+imgW = Math.round((w * 0.2 / 340) * imgW);
+imgH = imgW / 2;
+if (h > w) {
+    asterSize = Math.round((h * 0.09 / 128) * asterSize);
 }
-explSize = Math.round((h * 0.15 / 100)*explSize);
-rocketSize = Math.round((h * 0.03 / 30)*rocketSize);
+else {
+    asterSize = Math.round((w * 0.09 / 128) * asterSize);
+}
+explSize = Math.round((h * 0.15 / 100) * explSize);
+rocketSize = Math.round((h * 0.03 / 30) * rocketSize);
 
 function resizeGame() {
     h = window.innerHeight;
     w = window.innerWidth;
     canvas.setAttribute("height", h);
     canvas.setAttribute("width", w);
-    imgW = Math.round((w * 0.2 / 340)*  340);
-    imgH = imgW/2;
+    imgW = Math.round((w * 0.2 / 340) * 340);
+    imgH = imgW / 2;
     // imgH = Math.round((h * 0.2 / 170) *170 );
-    if (h>w) {
-        asterSize = Math.round((h * 0.09 / 128)*asterSize);}
-        else {
-            asterSize = Math.round((w *  0.09 / 128)*asterSize);
-        }
-    explSize = Math.round((h * 0.15 / 100)*explSize);
-    rocketSize = Math.round((h * 0.05 / 30)*rocketSize);
+    if (h > w) {
+        asterSize = Math.round((h * 0.09 / 128) * asterSize);
+    }
+    else {
+        asterSize = Math.round((w * 0.09 / 128) * asterSize);
+    }
+    explSize = Math.round((h * 0.15 / 100) * explSize);
+    rocketSize = Math.round((h * 0.05 / 30) * rocketSize);
 };
 
 // подстраиваемся под ресайз окна
@@ -123,7 +125,7 @@ function fire() {
         s: -2
     });
     rockets.push({
-        x: player.x + imgW/3,
+        x: player.x + imgW / 3,
         y: player.y,
         s: -2
     });
@@ -222,7 +224,7 @@ function render() {
     });
 
     rockets.forEach(element => {
-        context.drawImage(sprites.rocket, element.x + 9, element.y - 5, rocketSize, rocketSize*2);
+        context.drawImage(sprites.rocket, element.x + 9, element.y - 5, rocketSize, rocketSize * 2);
     });
 
     // рисуем игрока
@@ -245,18 +247,18 @@ function render() {
     context.fillStyle = "white";
     context.font = '24px sans-serif';
     context.fillText("SCORE: " + player.score, 25, 25, 100);
-    context.fillText("LIVES: " + player.lives, 25,50, 100);
+    context.fillText("LIVES: " + player.lives, 25, 50, 100);
 
 }
 
 // все обновления будут происходить тут
 
 function update() {
-    
+
     if (player.lives == 0) {
         gameOver();
     }
-    
+
     arrMove(stars);
     arrMove(rockets);
     arrMove(asteroids);
@@ -274,7 +276,7 @@ function update() {
             object.splice(index, 1);
         }
     });
-    
+
     // заставляем звёзды двигаться по игрику вниз и удаляем из массива улетевшие
     // будем использовать эту же функцию и для ракет
     function arrMove(arr) {
@@ -288,7 +290,7 @@ function update() {
 
     function arrExpl(arr) {
         arr.forEach(function (element, index, object) {
-            if (((player.y - element.y + 10) <= (imgH / 2 + asterSize / 2)) && ((Math.abs(element.x - player.x + 10)) <= (imgW/2 + asterSize/2))) {
+            if (((player.y - element.y + 10) <= (imgH / 2 + asterSize / 2)) && ((Math.abs(element.x - player.x + 10)) <= (imgW / 2 + asterSize / 2))) {
                 object.splice(index, 1);
                 player.lives = player.lives - 1; // уменьшаем жизни
                 vibrate(500);
@@ -380,7 +382,7 @@ window.onhashchange = switchURLHash;
 let isPlaying = false;
 
 
-function switchURLHash(EO){
+function switchURLHash(EO) {
     EO = EO || window.event;
     let toClose;
     // узнаемм заначение закладки
@@ -434,13 +436,13 @@ function startGame() {
     location.hash = "game";
     wrapper.style.display = "none";
     gameWrapper.style.display = "block";
-    
+
     gameLoop();
 }
 
 function loadInfo() {
     $.ajax("https://koltunsergey.github.io/projectJS/test.html",
-        { type:'GET', dataType:'html', success:dataLoaded, error:errorHandler }
+        { type: 'GET', dataType: 'html', success: dataLoaded, error: errorHandler }
     );
 }
 
@@ -448,8 +450,8 @@ function dataLoaded(data) {
     document.getElementById('rules').innerHTML = data;
 }
 
-function errorHandler(jqXHR,statusStr,errorStr) {
-    alert(statusStr+' '+errorStr);
+function errorHandler(jqXHR, statusStr, errorStr) {
+    alert(statusStr + ' ' + errorStr);
 }
 let yourScore = 0;
 
@@ -483,7 +485,7 @@ function startMenu() {
 
 function gameOver() {
     yourScore = player.score;
-    storeInfo();
+    
     timer = 0;
     asteroids.length = 0;
     gameWrapper.style.display = "none";
@@ -495,12 +497,6 @@ function gameOver() {
     }
 }
 
-
-
-
-
-
-
 let gameScore = document.querySelector(".scoreDiv");
 
 function getScores() {
@@ -509,80 +505,88 @@ function getScores() {
     gameScore.style.display = 'block';
 }
 
-var ajaxHandlerScript="https://fe.it-academy.by/AjaxStringStorage2.php";
-var messages; // элемент массива - {name:'Иванов',mess:'Привет'};
-var updatePassword;
-var stringName='KOLTUN_RESULT';
+
+let ajaxHandlerScript = "https://fe.it-academy.by/AjaxStringStorage2.php";
+let updatePassword;
+let stringName = 'KOLTUN_RESULT';
 
 function storeInfo() {
-    updatePassword=Math.random();
-    $.ajax( {
-      url : ajaxHandlerScript, type : 'POST', cache : false, dataType:'json',
-        data : { f : 'LOCKGET', n : stringName, p : updatePassword },
-        success : lockGetReady, error : errorHandler
-      }
-    );
-  }
-
-  function lockGetReady(callresult) {
-    if ( callresult.error!=undefined )
-      alert(callresult.error); 
-    else {
-      var result = JSON.parse(callresult.result)
-      result.push({record: player.score});
-      $.ajax( {
-        url : ajaxHandlerScript, type : 'POST', cache : false, dataType:'json',
-        data : { f : 'UPDATE', n : stringName, v : JSON.stringify(result), p : updatePassword },
-        success : updateReady, error : errorHandler
-        }
-      );
+    updatePassword = Math.random();
+    $.ajax({
+        sync: false,
+        url: ajaxHandlerScript,
+        type: 'POST',
+        cache: false,
+        retryLimit: 3,
+        dataType: 'json',
+        data: { f: 'LOCKGET', n: stringName, p: updatePassword },
+        success: lockGetReady, error: errorHandler
     }
-  }
-  
-  function updateReady(callresult) {
-    if ( callresult.error!=undefined )
-      console.log(callresult.error); 
-  }
-  function errorHandler(jqXHR,statusStr,errorStr) {
-    alert(statusStr+' '+errorStr);
-  }
-
-
-function restoreInfo() { 
-  $.ajax(
-    { 
-    url : ajaxHandlerScript, type : 'POST', cache : false, dataType:'json', 
-    data : { f : 'READ', n : stringName }, 
-    success : readReady, error : errorHandler 
-    } 
-  ); 
-} 
-
-function readReady(callresult) { 
-  if ( callresult.error!=undefined ) 
-    console.log(callresult.error); 
-  else if ( callresult.result!="" ) { 
-    var result=JSON.parse(callresult.result); 
-    createRecordTable(gameScore,result); 
-  } 
+    );
 }
 
-function createRecordTable(field,data){
-  var pageHTML = ''; 
-  pageHTML += '<table border=1> <thead> Результаты </thead><tbody>'; 
-  pageHTML += '<td>' + '№' + '</td>' + '<td>' + 'СЧЕТ' + '</td>'; 
-  for(var i = 0; i < data.length; i++){ 
-    if(i > 4){ 
-      break; 
-    } 
-    pageHTML += '<tr>'; 
-    pageHTML += '<td>' + (i+1) + '</td>' + '</td>' + '<td>' + data[i].record + '</td>'; 
-    pageHTML += '</tr>'; 
-  } 
-  pageHTML += '</tbody></table>'; 
-  field.innerHTML = pageHTML; 
-} 
-
-function errorHandler(jqXHR,statusStr,errorStr) { 
-  alert(statusStr+' '+errorStr); 
+function lockGetReady(callresult) {
+    if (callresult.error != undefined)
+        alert(callresult.error);
+    else {
+        var result = JSON.parse(callresult.result)
+        result.push({ record: yourScore });
+        $.ajax({
+            url: ajaxHandlerScript, type: 'POST', cache: false, dataType: 'json',
+            data: { f: 'UPDATE', n: stringName, v: JSON.stringify(result), p: updatePassword },
+            success: updateReady, error: errorHandler
+        }
+        );
+    }
 }
+
+function updateReady(callresult) {
+    if (callresult.error != undefined)
+        console.log(callresult.error);
+}
+
+function errorHandler(jqXHR, statusStr, errorStr) {
+    alert(statusStr + ' ' + errorStr);
+}
+
+storeInfo();
+
+function restoreInfo() {
+    $.ajax(
+        {   sync: false,
+            url: ajaxHandlerScript,
+            type: 'POST',
+            cache: false,
+            retryLimit: 3,
+            dataType: 'json',
+            data: { f: 'READ', n: stringName },
+            success: readReady,
+            error: errorHandler
+        }
+    );
+}
+
+function readReady(callresult) {
+    if (callresult.error != undefined)
+        console.log(callresult.error);
+    else if (callresult.result != "") {
+        var result = JSON.parse(callresult.result);
+        createRecordTable(gameScore, result);
+    }
+}
+
+function createRecordTable(field, data) {
+    var pageHTML = '';
+    pageHTML += '<table border=1> <thead> Результаты </thead><tbody>';
+    pageHTML += '<td>' + '№' + '</td>' + '<td>' + 'СЧЕТ' + '</td>';
+    for (var i = 0; i < data.length; i++) {
+        if (i > 4) {
+            break;
+        }
+        pageHTML += '<tr>';
+        pageHTML += '<td>' + (i + 1) + '</td>' + '</td>' + '<td>' + data[i].record + '</td>';
+        pageHTML += '</tr>';
+    }
+    pageHTML += '</tbody></table>';
+    field.innerHTML = pageHTML;
+} 
