@@ -470,6 +470,7 @@ function startMenu() {
     wrapper.style.display = "block";
     gameWrapper.style.display = "none";
     gameOverWrapper.style.display = "none";
+    gameScore.style.display = "none";
     asteroids.length = 0;
     rockets.length = 0;
     player.lives = 3;
@@ -485,7 +486,6 @@ function startMenu() {
 
 function gameOver() {
     yourScore = player.score;
-    
     timer = 0;
     asteroids.length = 0;
     gameWrapper.style.display = "none";
@@ -508,12 +508,14 @@ function getScores() {
 
 let ajaxHandlerScript = "https://fe.it-academy.by/AjaxStringStorage2.php";
 let updatePassword;
+var messages;
 let stringName = 'KOLTUN_RESULT';
+
+
 
 function storeInfo() {
     updatePassword = Math.random();
     $.ajax({
-        sync: false,
         url: ajaxHandlerScript,
         type: 'POST',
         cache: false,
@@ -529,11 +531,14 @@ function lockGetReady(callresult) {
     if (callresult.error != undefined)
         alert(callresult.error);
     else {
-        var result = JSON.parse(callresult.result)
-        result.push({ record: yourScore });
+        // нам всё равно, что было прочитано -
+        // всё равно перезаписываем
+        var info = {
+            record: yourScore,
+        };
         $.ajax({
             url: ajaxHandlerScript, type: 'POST', cache: false, dataType: 'json',
-            data: { f: 'UPDATE', n: stringName, v: JSON.stringify(result), p: updatePassword },
+            data: { f: 'UPDATE', n: stringName, v: JSON.stringify(info), p: updatePassword },
             success: updateReady, error: errorHandler
         }
         );
@@ -549,15 +554,15 @@ function errorHandler(jqXHR, statusStr, errorStr) {
     alert(statusStr + ' ' + errorStr);
 }
 
-storeInfo();
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 function restoreInfo() {
     $.ajax(
-        {   sync: false,
+        {
             url: ajaxHandlerScript,
             type: 'POST',
             cache: false,
-            retryLimit: 3,
+            // retryLimit: 3,
             dataType: 'json',
             data: { f: 'READ', n: stringName },
             success: readReady,
@@ -567,24 +572,27 @@ function restoreInfo() {
 }
 
 function readReady(callresult) {
-    if (callresult.error != undefined)
-        console.log(callresult.error);
-    else if (callresult.result != "") {
-        var result = JSON.parse(callresult.result);
-        createRecordTable(gameScore, result);
+
+    // if (callresult.error != undefined)
+    //     alert(callresult.error);
+    // else if (callresult.result != "") {
+        var info = JSON.parse(callresult.result);
+        // let dataZ = info.record;
+        createRecordTable(gameScore, info);
+        console.log (info);
     }
-}
+
 
 function createRecordTable(field, data) {
     var pageHTML = '';
     pageHTML += '<table border=1> <thead> Результаты </thead><tbody>';
     pageHTML += '<td>' + '№' + '</td>' + '<td>' + 'СЧЕТ' + '</td>';
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < 1; i++) {
         if (i > 4) {
             break;
         }
         pageHTML += '<tr>';
-        pageHTML += '<td>' + (i + 1) + '</td>' + '</td>' + '<td>' + data[i].record + '</td>';
+        pageHTML += '<td>' + (i + 1) + '</td>' + '</td>' + '<td>' + data.record + '</td>';
         pageHTML += '</tr>';
     }
     pageHTML += '</tbody></table>';
