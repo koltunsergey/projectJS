@@ -405,6 +405,9 @@ function switchURLHash(EO){
         case "game":
             startGame();
             break;
+        case "scores":
+            getScores();
+            break;
     }
 }
 
@@ -415,6 +418,7 @@ function startDocument() {
 let wrapper = document.querySelector(".menu");
 let gameWrapper = document.querySelector(".game");
 let gameOverWrapper = document.querySelector(".gameOver");
+
 
 function startHash() {
     location.hash = "game";
@@ -479,6 +483,7 @@ function startMenu() {
 
 function gameOver() {
     yourScore = player.score;
+    storeInfo();
     timer = 0;
     asteroids.length = 0;
     gameWrapper.style.display = "none";
@@ -492,3 +497,92 @@ function gameOver() {
 
 
 
+
+
+
+
+let gameScore = document.querySelector(".scoreDiv");
+
+function getScores() {
+    location.hash = "scores";
+    restoreInfo();
+    gameScore.style.display = 'block';
+}
+
+var ajaxHandlerScript="https://fe.it-academy.by/AjaxStringStorage2.php";
+var messages; // элемент массива - {name:'Иванов',mess:'Привет'};
+var updatePassword;
+var stringName='KOLTUN_RESULT';
+
+function storeInfo() {
+    updatePassword=Math.random();
+    $.ajax( {
+      url : ajaxHandlerScript, type : 'POST', cache : false, dataType:'json',
+        data : { f : 'LOCKGET', n : stringName, p : updatePassword },
+        success : lockGetReady, error : errorHandler
+      }
+    );
+  }
+
+  function lockGetReady(callresult) {
+    if ( callresult.error!=undefined )
+      alert(callresult.error); 
+    else {
+      var result = JSON.parse(callresult.result)
+      result.push({record: player.score});
+      $.ajax( {
+        url : ajaxHandlerScript, type : 'POST', cache : false, dataType:'json',
+        data : { f : 'UPDATE', n : stringName, v : JSON.stringify(result), p : updatePassword },
+        success : updateReady, error : errorHandler
+        }
+      );
+    }
+  }
+  
+  function updateReady(callresult) {
+    if ( callresult.error!=undefined )
+      console.log(callresult.error); 
+  }
+  function errorHandler(jqXHR,statusStr,errorStr) {
+    alert(statusStr+' '+errorStr);
+  }
+
+
+function restoreInfo() { 
+  $.ajax(
+    { 
+    url : ajaxHandlerScript, type : 'POST', cache : false, dataType:'json', 
+    data : { f : 'READ', n : stringName }, 
+    success : readReady, error : errorHandler 
+    } 
+  ); 
+} 
+
+function readReady(callresult) { 
+  if ( callresult.error!=undefined ) 
+    console.log(callresult.error); 
+  else if ( callresult.result!="" ) { 
+    var result=JSON.parse(callresult.result); 
+    createRecordTable(gameScore,result); 
+  } 
+}
+
+function createRecordTable(field,data){
+  var pageHTML = ''; 
+  pageHTML += '<table border=1> <thead> Результаты </thead><tbody>'; 
+  pageHTML += '<td>' + '№' + '</td>' + '<td>' + 'СЧЕТ' + '</td>'; 
+  for(var i = 0; i < data.length; i++){ 
+    if(i > 4){ 
+      break; 
+    } 
+    pageHTML += '<tr>'; 
+    pageHTML += '<td>' + (i+1) + '</td>' + '</td>' + '<td>' + data[i].record + '</td>'; 
+    pageHTML += '</tr>'; 
+  } 
+  pageHTML += '</tbody></table>'; 
+  field.innerHTML = pageHTML; 
+} 
+
+function errorHandler(jqXHR,statusStr,errorStr) { 
+  alert(statusStr+' '+errorStr); 
+}

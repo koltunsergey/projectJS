@@ -29,6 +29,11 @@ body {
     transform: translate(-50%);
 }
 
+.scoreDiv {
+    display: none;
+    z-index: 10;
+}
+
 .gameOver{
     width: 100vw;
     height: 100vh;
